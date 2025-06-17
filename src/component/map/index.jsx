@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { VectorMap } from "@react-jvectormap/core";
 import inMill from "./indiaMap.json";
 import { usMill } from "@react-jvectormap/unitedstates";
-import Legend from "./legends.jsx";
 import { useTheme } from "../../context/ThemeContext";
 
 const Map = (props) => {
@@ -42,21 +41,14 @@ const Map = (props) => {
       {isHovering && map && (
         <div className="absolute top-2 left-1/3 -translate-x-1/2 z-10 w-[160px] min-h-[40px] bg-gray-200 text-black text-sm rounded border border-white px-3 py-2 shadow">
           <p>Place: {code}</p>
-          <p>Fail Cases: {props.graphData?.[code] ?? "N/A"}</p>
+          <p>vaccination Count: {props.graphData?.[code] ?? "N/A"}</p>
         </div>
       )}
-
-      {/* Legend */}
-      <div className="absolute bottom-6 left-1/4 z-10 text-[10px] text-gray-500">
-        <p className="mb-1">Max----------Min</p>
-        <Legend />
-      </div>
-
       {/* Vector Map */}
       <div className="w-full h-full">
         {map ? (
           <VectorMap
-            key={`${props.country?.toLowerCase()}-${theme}`} // force re-render on map change
+            key={`${props.country?.toLowerCase()}-${theme}-${JSON.stringify(props.graphData)}`} // force re-render on map change
             map={map}
             containerStyle={{ width: "100%", height: "100%" }}
             backgroundColor={theme === "dark" ? "#1f2937" : "#ffffff"}

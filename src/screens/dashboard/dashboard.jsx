@@ -15,9 +15,12 @@ import {
 } from "lucide-react";
 import CountryList from "./country_list";
 import DetailsPanel from "./detail_panel";
+import { useLiveData } from "../../context/LiveDataContext";
 
-const Dashboard = () => {
+const Dashboard = (refresh) => {
   const { theme } = useTheme();
+  const { liveData } = useLiveData();
+  const api = ApiService(liveData);
   const [countries, setCountries] = useState([]); //imp
   const [states, setStates] = useState([]); //imp
   const [selectedCountry, setSelectedCountry] = useState(); //imp
@@ -28,18 +31,18 @@ const Dashboard = () => {
   // const [view, setView] = useState("chart"); //imp
   const [globalData, setGlobalData] = useState(null); //imp
   const [historicalData, setHistoricalData] = useState([]); //imp
-  const [useRealData, setUseRealData] = useState(true);
+  const [graphData, setGraphData] = useState([]);
 
 
   const fetchStateData = async (countryCode, countryName) => {
     try {
       let stateData = [];
       // Try to fetch real state data
-      if (countryCode === 'US' || countryName === 'USA') {
-        const data = await ApiService.fetchCovidDataByCountry(countryName)
+      if (countryCode === 'US' || countryName === 'USA' || countryName === 'India') {
+        const data = await api.fetchCovidDataByCountry(countryName)
         stateData = data.map(state => ({
           state: state.state,
-          country: 'USA',
+          country: countryName,
           totalCases: state.cases,
           activeCases: state.active,
           recovered: state.recovered || 0,
@@ -67,7 +70,7 @@ const Dashboard = () => {
   const loadGlobalData = async () => {
     setLoading(true);
     try {
-      const data = await ApiService.fetchGlobalCovidData();
+      const data = await api.fetchGlobalCovidData();
       console.log(data, "data");
       setGlobalData({
         cases: data.cases,
@@ -82,11 +85,30 @@ const Dashboard = () => {
     }
     setLoading(false);
   };
+  const loadGraphData = async (country) => {
+    setLoading(true);
+    try {
+      console.log("############################")
+      const data = await api.fetchCovidDataMapCountry(country);
+      console.log(data, "data");
+      setGlobalData({
+        cases: data.cases,
+        recovered: data.recovered,
+        deaths: data.deaths,
+        active: data.active,
+        updated: data.updated,
+      });
+      // setGraphData(data);
+    } catch (err) {
+      setError(err);
+    }
+    setLoading(false);
+  };
 
   const loadCountriesData = async () => {
     setLoading(true);
     try {
-      const data = await ApiService.fetchAllCountriesData();
+      const data = await api.fetchAllCountriesData();
       const formattedCountries = data.map((country) => ({
         country: country.country,
         countryCode: country.countryInfo.iso2,
@@ -119,7 +141,7 @@ const Dashboard = () => {
   const loadCountryData = async (country) => {
     setLoading(true);
     try {
-      const data = await ApiService.fetchCountryData(country);
+      const data = await api.fetchCountryData(country);
       console.log(data, "piedata");
       setpieData({
         recovered: data.recovered,
@@ -137,7 +159,7 @@ const Dashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await ApiService.fetchHistoricalDataByCountry(country);
+      const data = await api.fetchHistoricalDataByCountry(country);
       if (!data?.timeline) {
         throw new Error("Invalid data format received");
       }
@@ -161,21 +183,23 @@ const Dashboard = () => {
   useEffect(() => {
     loadGlobalData();
     loadCountriesData();
-  }, []);
+  }, [liveData,refresh]);
 
   useEffect(() => {
     if(selectedCountry){
       loadHistoricalData(selectedCountry?.country);
       loadCountryData(selectedCountry?.country);
-      const countriesWithStates = ['USA'];
+      
+      const countriesWithStates = ['USA','India'];
       if (countriesWithStates.includes(selectedCountry.country) || selectedCountry.countryCode) {
+        loadGraphData(selectedCountry.country)
         fetchStateData(selectedCountry.countryCode, selectedCountry.country);
       } else {
         setStates([]);
       }
     }
     
-  }, [selectedCountry]);
+  }, [selectedCountry,liveData]);
 
   
 
@@ -264,6 +288,7 @@ const Dashboard = () => {
               {selectedCountry || selectedState ? (
                 <DetailsPanel
                   theme={theme}
+                  graphData={graphData}
                   selectedCountry={selectedCountry}
                   selectedState={selectedState}
                   pieData={pieData}

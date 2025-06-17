@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { MapPin, ChevronDown, ChevronUp, Search } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { MapPin, ChevronDown, ChevronUp, Search, Filter } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import AddOn from "./addon_country_list.jsx";
 
 const CountryList = ({
   countries,
@@ -15,10 +16,26 @@ const CountryList = ({
   const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [showStates, setShowStates] = useState({});
+  const [showFilter, setShowFilter] = useState(false);
+  const [filteredAndSorted, setFilteredAndSorted] = useState(countries);
 
-  const filteredCountries = countries.filter((country) =>
-    country.country.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Calculate dynamic min/max cases
+  const caseValues = countries.map((c) => c.totalCases);
+  const minCases = Math.min(...caseValues);
+  const maxCases = Math.max(...caseValues);
+
+  useEffect(() => {
+    // Show all countries on load or when countries prop changes
+    setFilteredAndSorted(countries);
+  }, [countries]);
+
+  useEffect(() => {
+    // Apply live search
+    const updated = countries.filter((country) =>
+      country.country.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredAndSorted(updated);
+  }, [searchTerm, countries]);
 
   const toggleStates = (countryName) => {
     setShowStates((prev) => ({
@@ -27,9 +44,35 @@ const CountryList = ({
     }));
   };
 
+  const handleApply = ({ range, sortBy, sortOrder }) => {
+    const [minValue, maxValue] = range;
+
+    const updated = countries
+      .filter((country) =>
+        country.country.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .filter(
+        (country) =>
+          country.totalCases >= minValue && country.totalCases <= maxValue
+      )
+      .sort((a, b) => {
+        if (sortBy === "number") {
+          return sortOrder === "asc"
+            ? a.totalCases - b.totalCases
+            : b.totalCases - a.totalCases;
+        } else {
+          return sortOrder === "asc"
+            ? a.country.localeCompare(b.country)
+            : b.country.localeCompare(a.country);
+        }
+      });
+
+    setFilteredAndSorted(updated);
+  };
+
   return (
     <div
-      className={`$${
+      className={`${
         theme === "dark" ? "bg-gray-800" : "bg-white"
       } rounded-xl shadow-lg p-4 sm:p-6`}
     >
@@ -48,7 +91,30 @@ const CountryList = ({
         />
       </div>
 
-      <h2 className="text-lg sm:text-xl font-bold mb-4">Countries & States</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+        <h2 className="text-lg sm:text-xl font-bold">Countries & States</h2>
+
+        <div className="relative">
+          <button
+            onClick={() => setShowFilter(!showFilter)}
+            className="flex items-center space-x-2 text-blue-600"
+          >
+            <Filter className="w-5 h-5" />
+            <span>Filter</span>
+          </button>
+
+          {showFilter && (
+            <div className="absolute top-10 left-0 w-full sm:w-80 z-50">
+              <AddOn
+                min={minCases}
+                max={maxCases}
+                onApply={handleApply}
+                onClose={() => setShowFilter(false)}
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="space-y-2 max-h-[60vh] overflow-y-auto">
         {loading ? (
@@ -56,7 +122,7 @@ const CountryList = ({
             <div className="animate-pulse">Loading data...</div>
           </div>
         ) : (
-          filteredCountries.map((country) => (
+          filteredAndSorted.map((country) => (
             <div key={country.country}>
               <div
                 className={`p-3 sm:p-4 rounded-lg cursor-pointer transition-all ${

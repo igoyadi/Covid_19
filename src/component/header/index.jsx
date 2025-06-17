@@ -1,7 +1,9 @@
 import React from "react";
 import { Moon, Sun, RefreshCw } from "lucide-react";
+import { useLiveData } from "../../context/LiveDataContext";
 
-const Header = ({ theme, toggleTheme }) => {
+const Header = ({ theme, toggleTheme ,setRefresh,refresh}) => {
+  const { liveData, setLiveData } = useLiveData();
   return (
     <header
       className={`${
@@ -21,22 +23,22 @@ const Header = ({ theme, toggleTheme }) => {
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
             {/* Live/Mock Toggle */}
             <button
-              onClick={() => console.log("click1")}
+              onClick={() => setLiveData(!liveData)}
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 true ? "bg-green-500 text-white" : "bg-gray-500 text-white"
               }`}
               title="Toggle between real and mock data"
             >
-              {true ? "Live Data" : "Mock Data"}
+              {liveData ? "Live Data" : "Mock Data"}
             </button>
 
             {/* Refresh Button */}
             <button
-              onClick={() => console.log("click2")}
+              onClick={() => setRefresh(!refresh)}
               className="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
               title="Refresh Data"
             >
-              <RefreshCw className={`w-5 h-5 ${true ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-5 h-5 `} />
             </button>
 
             {/* Theme Toggle */}

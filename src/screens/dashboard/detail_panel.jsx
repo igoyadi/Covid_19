@@ -7,6 +7,7 @@ import {
   CovidBarChart,
   Map,
 } from "../../component";
+import { useLiveData } from "../../context/LiveDataContext";
 
 const DetailsPanel = ({
   theme,
@@ -16,21 +17,13 @@ const DetailsPanel = ({
   historicalData,
   states,
   formatNumber,
+  graphData
 }) => {
   const region = selectedState || selectedCountry;
   const [view, setView] = useState("chart");
-  const graphData = {
-    "IN-UP": 1200,
-    "IN-MH": 980,
-    "IN-TN": 760,
-    "IN-KA": 640,
-    "IN-DL": 520,
-    "IN-GJ": 410,
-    "IN-RJ": 320,
-    "IN-WB": 250,
-    "IN-BR": 190,
-    "IN-PB": 120,
-  };
+  const { liveData } = useLiveData();
+
+ 
   const values = Object.values(graphData);
   const maxvalue = Math.max(...values);
   const minvalue = Math.min(...values);
@@ -64,7 +57,7 @@ const DetailsPanel = ({
           )}
         </h2>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-          {["chart", "table", "map"].map((mode) => (
+          {(liveData?["chart", "table", "map"]:["chart", "table"]).map((mode) => (
             <button
               key={mode}
               onClick={() => setView(mode)}
