@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MockApiService from './mockApi';
+import MockApiService from './mockapi';
 
 const ApiService = (liveData) => ({
   async fetchCovidDataMapCountry(country) {
