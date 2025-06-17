@@ -91,14 +91,14 @@ const Dashboard = (refresh) => {
       console.log("############################")
       const data = await api.fetchCovidDataMapCountry(country);
       console.log(data, "data");
-      setGlobalData({
-        cases: data.cases,
-        recovered: data.recovered,
-        deaths: data.deaths,
-        active: data.active,
-        updated: data.updated,
-      });
-      // setGraphData(data);
+      // setGlobalData({
+      //   cases: data.cases,
+      //   recovered: data.recovered,
+      //   deaths: data.deaths,
+      //   active: data.active,
+      //   updated: data.updated,
+      // });
+      setGraphData(data);
     } catch (err) {
       setError(err);
     }

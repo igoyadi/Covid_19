@@ -123,7 +123,13 @@ const CountryList = ({
           </div>
         ) : (
           filteredAndSorted.map((country) => (
-            <div key={country.country}>
+            <div key={country.country}
+            onClick={() => {
+                    setSelectedCountry(country);
+                    setSelectedState(null);
+                    toggleStates(country.country);
+                  }}
+                  >
               <div
                 className={`p-3 sm:p-4 rounded-lg cursor-pointer transition-all ${
                   selectedCountry?.country === country.country && !selectedState
@@ -134,11 +140,6 @@ const CountryList = ({
                 }`}
               >
                 <div
-                  onClick={() => {
-                    setSelectedCountry(country);
-                    setSelectedState(null);
-                    toggleStates(country.country);
-                  }}
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0"
                 >
                   <div className="flex items-center space-x-3">
