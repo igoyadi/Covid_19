@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapPin, ChevronDown, ChevronUp, Search, Filter } from "lucide-react";
+import { MapPin, ChevronDown, ChevronUp, Search, SlidersHorizontal } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import AddOn from "./addon_country_list.jsx";
 
@@ -93,14 +93,15 @@ const CountryList = ({
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
         <h2 className="text-lg sm:text-xl font-bold">Countries & States</h2>
-
-        <div className="relative">
+        <div className="relative" title="Filtering and Sorting">
           <button
             onClick={() => setShowFilter(!showFilter)}
             className="flex items-center space-x-2 text-blue-600"
           >
-            <Filter className="w-5 h-5" />
-            <span>Filter</span>
+            <SlidersHorizontal className="w-5 h-5" />
+            
+            {/* <span className="text-sm font-medium">Filter</span> */}
+
           </button>
 
           {showFilter && (
@@ -117,12 +118,7 @@ const CountryList = ({
       </div>
 
       <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-pulse">Loading data...</div>
-          </div>
-        ) : (
-          filteredAndSorted.map((country) => (
+          {filteredAndSorted.map((country) => (
             <div key={country.country}
             onClick={() => {
                     setSelectedCountry(country);
@@ -199,8 +195,7 @@ const CountryList = ({
                   </div>
                 )}
             </div>
-          ))
-        )}
+          ))}  
       </div>
     </div>
   );

@@ -13,7 +13,6 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 
 const CovidBarChart = ({ countriesData = [] ,state=false }) => {
-  console.log(countriesData,"countriesData")
     const { theme} = useTheme();
   return (
     <div className={`${

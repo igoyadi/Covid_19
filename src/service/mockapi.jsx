@@ -30,7 +30,6 @@ const MockApiService = {
 
     async fetchGlobalCovidData() {
         try {
-          console.log("mockdata")
           const response = await axios.get(`${BASEURL}/api/global`);
           const data = response.data;
           return data;

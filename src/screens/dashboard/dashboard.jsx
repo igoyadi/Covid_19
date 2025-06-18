@@ -11,19 +11,18 @@ import {
   Activity,
   Shield,
   Globe,
-  AlertCircle,
 } from "lucide-react";
 import CountryList from "./country_list";
 import DetailsPanel from "./detail_panel";
 import { useLiveData } from "../../context/LiveDataContext";
 
-const Dashboard = (refresh) => {
+const Dashboard = (home, refresh) => {
   const { theme } = useTheme();
   const { liveData } = useLiveData();
   const api = ApiService(liveData);
   const [countries, setCountries] = useState([]); //imp
   const [states, setStates] = useState([]); //imp
-  const [selectedCountry, setSelectedCountry] = useState(); //imp
+  const [selectedCountry, setSelectedCountry] = useState(null); //imp
   const [selectedState, setSelectedState] = useState(null);
   const [pieData, setpieData] = useState(null); //imp
   const [loading, setLoading] = useState(true); //imp
@@ -71,7 +70,6 @@ const Dashboard = (refresh) => {
     setLoading(true);
     try {
       const data = await api.fetchGlobalCovidData();
-      console.log(data, "data");
       setGlobalData({
         cases: data.cases,
         recovered: data.recovered,
@@ -88,9 +86,7 @@ const Dashboard = (refresh) => {
   const loadGraphData = async (country) => {
     setLoading(true);
     try {
-      console.log("############################")
       const data = await api.fetchCovidDataMapCountry(country);
-      console.log(data, "data");
       // setGlobalData({
       //   cases: data.cases,
       //   recovered: data.recovered,
@@ -142,7 +138,6 @@ const Dashboard = (refresh) => {
     setLoading(true);
     try {
       const data = await api.fetchCountryData(country);
-      console.log(data, "piedata");
       setpieData({
         recovered: data.recovered,
         active: data.active,
@@ -170,7 +165,6 @@ const Dashboard = (refresh) => {
         deaths: deaths[date],
         recovered: recovered[date],
       }));
-      console.log(formattedData, "formattedData");
       setHistoricalData(formattedData);
     } catch (err) {
       console.error(`Failed to load historical data for ${country}:`, err);
@@ -183,7 +177,9 @@ const Dashboard = (refresh) => {
   useEffect(() => {
     loadGlobalData();
     loadCountriesData();
-  }, [liveData,refresh]);
+    setSelectedCountry(null);
+    setSelectedState(null);
+  }, [liveData,refresh, home]);
 
   useEffect(() => {
     if(selectedCountry){

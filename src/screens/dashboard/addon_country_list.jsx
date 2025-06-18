@@ -18,7 +18,7 @@ const AddOn = ({ min, max, onApply, onClose }) => {
   return (
     <div className={`shadow-xl rounded-xl p-4 border w-full sm:w-80 mx-auto ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Filter Options</h3>
+        <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Filter & Sort Options</h3>
         <button onClick={onClose}>
           <X className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-500 hover:text-black'}`} />
         </button>

@@ -6,9 +6,7 @@ const ApiService = (liveData) => ({
     if (liveData) {
       return MockApiService.fetchCovidDataMapCountry(country);
     }
-
     try {
-      // const response = await axios.get('https://disease.sh/v3/covid-19/states');
       return [];
     } catch (error) {
       console.error(`Failed to fetch COVID-19 data for ${country}:`, error.message);
@@ -19,9 +17,13 @@ const ApiService = (liveData) => ({
     if (liveData) {
       return MockApiService.fetchCovidDataByCountry(country);
     }
+    if(country=='India'){
+      return [];
+    }
 
     try {
       const response = await axios.get('https://disease.sh/v3/covid-19/states');
+      
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch COVID-19 data for ${country}:`, error.message);

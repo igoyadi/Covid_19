@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
 import {
   Card,
@@ -27,6 +27,10 @@ const DetailsPanel = ({
   const values = Object.values(graphData);
   const maxvalue = Math.max(...values);
   const minvalue = Math.min(...values);
+
+  useEffect(()=>{
+    setView("chart")
+  },[liveData])
 
   return (
     <div
@@ -88,7 +92,7 @@ const DetailsPanel = ({
         <div className="space-y-6">
           {!selectedState && historicalData.length > 0 && (
             <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-4">30-Day Trend</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-4">60-Day Trend</h3>
               <div className="h-[300px] sm:h-[400px] w-full">
                 <CovidAreaChart chartData={historicalData} country={region} />
               </div>
@@ -133,94 +137,92 @@ const DetailsPanel = ({
 
       {/* View: Table */}
       {view === "table" && region && (
-        <div className="overflow-x-auto mt-6">
-          <table className="w-full text-sm">
-            <thead>
-              <tr
-                className={`${
-                  theme === "dark" ? "bg-gray-700" : "bg-gray-100"
-                }`}
-              >
-                <th className="px-4 py-3 text-left">Metric</th>
-                <th className="px-4 py-3 text-right">Value</th>
-                {!selectedState && (
-                  <th className="px-4 py-3 text-right">Per Million</th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {[
+  <div className="overflow-x-auto mt-6">
+    <table className="w-full text-sm table-fixed">
+      <thead>
+        <tr className={theme === "dark" ? "bg-gray-700" : "bg-gray-100"}>
+          <th className="w-1/3 px-4 py-3 text-left">Metric</th>
+          <th className="w-1/3 px-4 py-3 text-right">Value</th>
+          {!selectedState && (
+            <th className="w-1/3 px-4 py-3 text-right">Per Million</th>
+          )}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-200">
+        {[
+          {
+            label: "Total Cases",
+            value: region.totalCases,
+            pm: selectedCountry?.casesPerOneMillion,
+          },
+          {
+            label: "Active Cases",
+            value: region.activeCases,
+            pm: selectedCountry?.activePerOneMillion,
+          },
+          {
+            label: "Recovered",
+            value: region.recovered,
+            pm: selectedCountry?.recoveredPerOneMillion,
+          },
+          {
+            label: "Deaths",
+            value: region.deaths,
+            pm: selectedCountry?.deathsPerOneMillion,
+          },
+          ...(selectedCountry?.critical
+            ? [
                 {
-                  label: "Total Cases",
-                  value: region.totalCases,
-                  pm: selectedCountry?.casesPerOneMillion,
+                  label: "Critical",
+                  value: selectedCountry.critical,
+                  pm: selectedCountry?.criticalPerOneMillion,
                 },
+              ]
+            : []),
+          ...(region?.tests
+            ? [
                 {
-                  label: "Active Cases",
-                  value: region.activeCases,
-                  pm: selectedCountry?.activePerOneMillion,
+                  label: "Tests",
+                  value: region.tests,
+                  pm: selectedCountry?.testsPerOneMillion,
                 },
+              ]
+            : []),
+          ...(region?.population
+            ? [
                 {
-                  label: "Recovered",
-                  value: region.recovered,
-                  pm: selectedCountry?.recoveredPerOneMillion,
+                  label: "Population",
+                  value: region.population,
                 },
+              ]
+            : []),
+          ...(selectedCountry?.continent
+            ? [
                 {
-                  label: "Deaths",
-                  value: region.deaths,
-                  pm: selectedCountry?.deathsPerOneMillion,
+                  label: "Continent",
+                  value: selectedCountry.continent,
                 },
-                ...(selectedCountry?.critical
-                  ? [
-                      {
-                        label: "Critical",
-                        value: selectedCountry.critical,
-                        pm: selectedCountry?.criticalPerOneMillion,
-                      },
-                    ]
-                  : []),
-                ...(region?.tests
-                  ? [
-                      {
-                        label: "Tests",
-                        value: region.tests,
-                        pm: selectedCountry?.testsPerOneMillion,
-                      },
-                    ]
-                  : []),
-                ...(region?.population
-                  ? [
-                      {
-                        label: "Population",
-                        value: region.population,
-                      },
-                    ]
-                  : []),
-                ...(selectedCountry?.continent
-                  ? [
-                      {
-                        label: "Continent",
-                        value: selectedCountry.continent,
-                      },
-                    ]
-                  : []),
-              ].map((row, idx) => (
-                <tr key={idx}>
-                  <td className="px-4 py-3 whitespace-nowrap">{row.label}</td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {formatNumber(row.value)}
-                  </td>
-                  {!selectedState && (
-                    <td className="px-4 py-3 text-right text-gray-500">
-                      {row.pm ? formatNumber(row.pm) : "-"}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              ]
+            : []),
+        ].map((row, idx) => (
+          <tr key={idx}>
+            <td className="px-4 py-3 text-left whitespace-nowrap">
+              {row.label}
+            </td>
+            <td className="px-4 py-3 text-right font-medium">
+              {formatNumber(row.value)}
+            </td>
+            {!selectedState && (
+              <td className="px-4 py-3 text-right text-gray-500">
+                {row.pm ? formatNumber(row.pm) : "-"}
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
     </div>
   );
 };

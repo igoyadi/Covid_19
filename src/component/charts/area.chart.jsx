@@ -14,7 +14,6 @@ import { useTheme } from "../../context/ThemeContext";
 
 const CovidAreaChart = ({ chartData = [], country = "Unknown" }) => {
   const { theme } = useTheme();
-  console.log(chartData, "chartData");
   return (
     <div className={`${
       theme === "dark" ? "bg-gray-800" : "bg-white"
